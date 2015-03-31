@@ -1,0 +1,106 @@
+#Build chromium-beta 59
+#
+cd /workspace/server/chromium/android-chrome-todo/x86/39.0.2171.59-beta
+
+vim README
+
+cd /workspace/project/chrome-android/39.0.2171.59
+
+python chromium.py --repo-type chrome-android --target-os android --target-module chrome --dir-root /workspace/project/chrome-android/39.0.2171.59 --target-arch x86 --ver 39.0.2171.59 --ver-type beta --phase-continue
+
+
+# Install Chromium.apk
+#
+cd /workspace/server/chromium/android-chrome-todo/x86/39.0.2171.59-beta
+
+adb install -r Chromium.apk
+
+   # Debug (Seems only work on 32bit image)
+   cd /workspace/project/chrome-android/39.0.2171.59/src/out-x86/out/Release/lib
+   mv libchrome.2171.59.so libchrome.2171.59.so.bak
+   mv libchrome_prebuilt.so libchrome.2171.59.so
+
+#debug com.chromium.beta
+#
+cd /workspace/project/chrome-android/39.0.2171.59/src/build/android
+
+./adb_gdb --out-dir=out-x86/out --target-arch=x86 --release com.chromium.beta --verbose --force
+
+b texture_manager.cc:1529
+
+adb shell 'am start -a android.intent.action.VIEW -n com.chromium.beta/com.google.android.apps.chrome.Main -d http://10.239.47.53/webGL/tests/rendering/multisample-corruption.html'
+
+
+
+
+
+
+#2.command
+# find *.cc files that contain 'ContextState'
+find . -name "*.cc" | xargs grep ContextState
+
+# print the path of context_state.cc in parent directory
+
+
+
+
+
+
+gpu/command_buffer/common/constants.h namespace error
+enum Error {
+ 19     kNoError,
+ 20     kInvalidSize,
+ 21     kOutOfBounds,
+ 22     kUnknownCommand,
+ 23     kInvalidArguments,
+ 24     kLostContext,
+ 25     kGenericError,
+ 26     kDeferCommandUntilLater
+ 27   };
+
+
+
+
+
+
+
+
+find | grep context_state.cc 
+
+
+
+#build content_shell
+cd /home/stephenliu/projects/chromium-android
+
+python chromium.py --build --target-os android --target-module content_shell --build-type debug --target-arch x86 --phase-continue
+
+
+#debug content_shell
+cd /home/stephenliu/projects/chromium-android/src/build/android
+
+./adb_content_shell_command_line --wait-for-debugger --enable-gpu-debugging
+
+adb shell am start -n org.chromium.content_shell_apk/.ContentShellActivity -d "http://10.239.47.115/webgl/conformance/rendering/multisample-corruption.html"
+
+./adb_gdb_content_shell --out-dir=out-x86/out --target-arch=x86 --debug --package-name=org.chromium.content_shell_apk --verbose --sandboxed
+
+b gles2_implementation.cc:421
+
+logcat chromium:V *:F
+
+// track the stack process
+cd $CHROMIUM/src
+source build/android/envsetup.sh
+build/android/tombstones.py
+
+
+
+
+// chenjie webgl
+http://jchen10-dev.sh.intel.com/WebGL/
+
+
+// print logcat message
+#include "/home/stephenliu/projects/chromium-android/src/third_party/hwcplus/include/android/log.h"
+
+ __android_log_print(ANDROID_LOG_WARN, "NATIVE CODE", "size: w = %d", adjustedSize.width());
